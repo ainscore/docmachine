@@ -27,25 +27,26 @@ enum class VertAlignment {
 }
 
 class Text(
-        val text:String,
-        var width:Double=Double.POSITIVE_INFINITY,
-        val height:Double=Double.POSITIVE_INFINITY,
-        val fontSize:Double=10.0,
-        val lineHeight:Double=10.0,
-        val fontColor:CMYKColor=BLACK,
-        val fontStyle:FontStyle=FontStyle.NORMAL,
-        val xAlignment:HorzAlignment=HorzAlignment.LEFT,
-        val yAlignment:VertAlignment=VertAlignment.BOTTOM,
-        val characterSpacing:Double=0.0
-): Drawable {
+    val text: String,
+    var width: Double = Double.POSITIVE_INFINITY,
+    val height: Double = Double.POSITIVE_INFINITY,
+    val fontSize: Double = 10.0,
+    val lineHeight: Double = 10.0,
+    val fontColor: CMYKColor = BLACK,
+    val fontStyle: FontStyle = FontStyle.NORMAL,
+    val xAlignment: HorzAlignment = HorzAlignment.LEFT,
+    val yAlignment: VertAlignment = VertAlignment.BOTTOM,
+    val characterSpacing: Double = 0.0
+) : Drawable {
 
     private fun getAscent(pdFont: PDFont): Double {
         return pdFont.fontDescriptor.ascent.toDouble() / 1000.0 * fontSize
     }
 
     override fun draw(renderedDoc: RenderedDocument): RenderedDrawable {
-        val pdFont = renderedDoc.fonts.getOrElse(fontStyle) { throw Exception("No font for style: %s".format(fontStyle))}
-        val getStringWidth:(String) -> Double = { string ->
+        val pdFont =
+            renderedDoc.fonts.getOrElse(fontStyle) { throw Exception("No font for style: %s".format(fontStyle)) }
+        val getStringWidth: (String) -> Double = { string ->
             pdFont.getStringWidth(string) / 1000.0 * fontSize + characterSpacing / 1000 * fontSize * (string.length - 1)
         }
 
@@ -69,10 +70,10 @@ class Text(
             val justifiedText = JustifiedText(getStringWidth, text, width)
             positionedLines = justifiedText.getText()
         } else {
-            positionedLines = text.split("\n".toRegex()).flatMap {line ->
+            positionedLines = text.split("\n".toRegex()).flatMap { line ->
                 var newLines = emptyList<String>()
                 var currentLine = emptyList<String>()
-                line.split(" ".toRegex()).forEach {word ->
+                line.split(" ".toRegex()).forEach { word ->
                     val testLine = currentLine + word
                     if (getStringWidth(testLine.joinToString(" ")) <= width) {
                         currentLine = testLine
@@ -98,18 +99,33 @@ class Text(
 
         val finalPositionedLines = positionedLines.toMutableList()
 
-        val draw:RenderFunction = { stream, loc ->
+        val draw: RenderFunction = { stream, loc ->
             val xPos = loc.x
             val yPos = loc.y - yOffset
             stream.beginText()
-            stream.setStrokingColor(fontColor.c.toFloat(), fontColor.m.toFloat(), fontColor.y.toFloat(), fontColor.k.toFloat())
-            stream.setNonStrokingColor(fontColor.c.toFloat(), fontColor.m.toFloat(), fontColor.y.toFloat(), fontColor.k.toFloat())
+            stream.setStrokingColor(
+                fontColor.c.toFloat(),
+                fontColor.m.toFloat(),
+                fontColor.y.toFloat(),
+                fontColor.k.toFloat()
+            )
+            stream.setNonStrokingColor(
+                fontColor.c.toFloat(),
+                fontColor.m.toFloat(),
+                fontColor.y.toFloat(),
+                fontColor.k.toFloat()
+            )
             stream.setCharacterSpacing((characterSpacing / 1000 * fontSize).toFloat())
             stream.setFont(pdFont, fontSize.toFloat())
             stream.setLeading(lineHeight.toFloat())
             stream.newLineAtOffset(xPos.toFloat(), yPos.toFloat())
-            for (line in finalPositionedLines) {
-                val commands = line.flatMap { wordPosition -> listOf((-(wordPosition.offset / fontSize * 1000)).toFloat(), wordPosition.word) }.toTypedArray()
+            finalPositionedLines.forEach { line ->
+                val commands = line.flatMap { wordPosition ->
+                    listOf(
+                        (-(wordPosition.offset / fontSize * 1000)).toFloat(),
+                        wordPosition.word
+                    )
+                }.toTypedArray()
                 try {
                     stream.showTextWithPositioning(commands)
                 } catch (e: IOException) {
@@ -133,9 +149,9 @@ class Text(
     }
 }
 
-data class WordPosition (val word: String, val offset: Double)
+data class WordPosition(val word: String, val offset: Double)
 
-class JustifiedText(val getStringWidth: (String) -> Double, val text: String, val width:Double) {
+class JustifiedText(val getStringWidth: (String) -> Double, val text: String, val width: Double) {
 
     val parentMap = HashMap<Int, Int>()
     val memoMap = HashMap<Int, Double>()
@@ -157,7 +173,7 @@ class JustifiedText(val getStringWidth: (String) -> Double, val text: String, va
                 if (lines.indexOf(words) == lines.size - 1) {
                     listOf(WordPosition(words.joinToString(" "), xPos))
                 } else {
-                    words.map { word -> WordPosition(word, offset=if (words.indexOf(word) == 0) 0.0 else spaceWidth) }
+                    words.map { word -> WordPosition(word, offset = if (words.indexOf(word) == 0) 0.0 else spaceWidth) }
                 }
             }
         }

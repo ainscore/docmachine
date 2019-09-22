@@ -14,7 +14,7 @@ interface Font {
     fun addFontToDocument(pdDocument: PDDocument): PDFont
 }
 
-class TTFFont private constructor(val fontPath: String): Font{
+class TTFFont private constructor(val fontPath: String) : Font {
 
     override fun addFontToDocument(pdDocument: PDDocument): PDFont {
         return PDType0Font.load(pdDocument, ByteArrayInputStream(loadFontFile(fontPath)))
@@ -37,7 +37,7 @@ class TTFFont private constructor(val fontPath: String): Font{
     }
 }
 
-class BuiltinFont(val font: PDType1Font): Font{
+class BuiltinFont(val font: PDType1Font) : Font {
     override fun addFontToDocument(pdDocument: PDDocument): PDFont {
         return font
     }

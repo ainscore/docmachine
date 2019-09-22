@@ -1,6 +1,6 @@
 package com.andrewinscore.docmachine
 
-data class Section (val pages: List<Page>, val pageNumbering: PageNumbering = PageNumbering.DECIMAL)
+data class Section(val pages: List<Page>, val pageNumbering: PageNumbering = PageNumbering.DECIMAL)
 
 enum class PageNumbering {
     DECIMAL,

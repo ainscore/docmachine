@@ -3,7 +3,7 @@ package com.andrewinscore.docmachine.style
 /**
  * @author ainscore
  */
-data class CMYKColor (val c: Double, val m: Double, val y: Double, val k: Double)
+data class CMYKColor(val c: Double, val m: Double, val y: Double, val k: Double)
 
 val BLUE = CMYKColor(.96, .16, .1, 0.0)
 val GREEN = CMYKColor(.65, 0.0, .56, 0.0)

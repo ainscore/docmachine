@@ -16,11 +16,11 @@ class VerticalLayout(val drawables: Sequence<Drawable>) : Drawable {
 
         val width = renderedDrawables.map { it.width }.max()
 
-        val height = renderedDrawables.map{ it.height }.sum()
+        val height = renderedDrawables.map { it.height }.sum()
 
         val draw: RenderFunction = { stream, loc ->
             var prevHeight = 0.0
-            for (renderedDrawable in renderedDrawables) {
+            renderedDrawables.forEach { renderedDrawable ->
                 renderedDrawable.draw(stream, loc.add(0.0, -prevHeight))
                 prevHeight += renderedDrawable.height
             }

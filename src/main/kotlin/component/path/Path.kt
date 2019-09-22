@@ -1,6 +1,5 @@
 package com.andrewinscore.docmachine.component.path
 
-import com.google.common.collect.Lists
 import com.andrewinscore.docmachine.Bounds
 import com.andrewinscore.docmachine.Drawable
 import com.andrewinscore.docmachine.RenderFunction
@@ -12,26 +11,31 @@ import com.andrewinscore.docmachine.style.CMYKColor
 import java.io.IOException
 
 
-class Path(private val _fillColor: CMYKColor, private val _strokeColor: CMYKColor) : Drawable {
-    private val commands = Lists.newLinkedList<PathCommand>()
-
-    fun addCommand(command: PathCommand) {
-        commands.add(command)
-    }
-
+class Path(val commands: List<PathCommand>, private val _fillColor: CMYKColor, private val _strokeColor: CMYKColor) :
+    Drawable {
     override fun draw(renderedDoc: RenderedDocument): RenderedDrawable {
         val draw: RenderFunction = { stream, loc ->
             if (_fillColor != CLEAR) {
                 commands.forEach { command -> command.draw(stream, loc) }
                 val fillColor = _fillColor
-                stream.setNonStrokingColor(fillColor.c.toFloat(), fillColor.m.toFloat(), fillColor.y.toFloat(), fillColor.k.toFloat())
+                stream.setNonStrokingColor(
+                    fillColor.c.toFloat(),
+                    fillColor.m.toFloat(),
+                    fillColor.y.toFloat(),
+                    fillColor.k.toFloat()
+                )
                 stream.fillEvenOdd()
             }
             if (_strokeColor != CLEAR) {
                 commands.forEach { command -> command.draw(stream, loc) }
                 val strokeColor = _strokeColor
                 try {
-                    stream.setStrokingColor(strokeColor.c.toFloat(), strokeColor.m.toFloat(), strokeColor.y.toFloat(), strokeColor.k.toFloat())
+                    stream.setStrokingColor(
+                        strokeColor.c.toFloat(),
+                        strokeColor.m.toFloat(),
+                        strokeColor.y.toFloat(),
+                        strokeColor.k.toFloat()
+                    )
                     stream.stroke()
                 } catch (e: IOException) {
                     throw RuntimeException(e)

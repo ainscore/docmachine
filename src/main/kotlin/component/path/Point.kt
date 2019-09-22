@@ -13,14 +13,14 @@ data class Point(val x: Double, val y: Double) {
         return Math.sqrt(Math.pow(x - center.x, 2.0) + Math.pow(y - center.y, 2.0))
     }
 
-    fun rotate(rotation: Double, center: Point) : Point {
+    fun rotate(rotation: Double, center: Point): Point {
         val start = Vector(x - center.x, y - center.y)
         val end = start.addTheta(rotation)
         val trans = end - start
         return Point(x + trans.x, y + trans.y);
     }
 
-    operator fun plus(vector: Vector) : Point {
+    operator fun plus(vector: Vector): Point {
         return Point(x + vector.x, y + vector.y);
     }
 

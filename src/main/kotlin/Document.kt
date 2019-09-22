@@ -25,6 +25,7 @@ class Document(val fonts: Map<FontStyle, Font>, val sections: List<Section>) {
     fun writeToFile(fileName: String) {
 
         val pdDocument = PDDocument()
+        pdDocument.documentId = 12345 // Keep doc content stable across runs
 
         val pageLabels = PDPageLabels(pdDocument)
 
@@ -32,32 +33,34 @@ class Document(val fonts: Map<FontStyle, Font>, val sections: List<Section>) {
         pdDocument.documentCatalog.documentOutline = outline
 
         val defaults: Map<FontStyle, Font> = mapOf(
-                FontStyle.NORMAL to BuiltinFont(PDType1Font.HELVETICA),
-                FontStyle.BOLD to BuiltinFont(PDType1Font.HELVETICA_BOLD),
-                FontStyle.ITALIC to BuiltinFont(PDType1Font.HELVETICA_OBLIQUE),
-                FontStyle.BOLD_ITALIC to BuiltinFont(PDType1Font.HELVETICA_BOLD_OBLIQUE)
+            FontStyle.NORMAL to BuiltinFont(PDType1Font.HELVETICA),
+            FontStyle.BOLD to BuiltinFont(PDType1Font.HELVETICA_BOLD),
+            FontStyle.ITALIC to BuiltinFont(PDType1Font.HELVETICA_OBLIQUE),
+            FontStyle.BOLD_ITALIC to BuiltinFont(PDType1Font.HELVETICA_BOLD_OBLIQUE)
         )
 
         val fontsWithDefaults = defaults + fonts
 
-        val renderedDoc = RenderedDocument(fontsWithDefaults.mapValues { font -> font.value.addFontToDocument(pdDocument) }, pdDocument)
+        val renderedDoc = RenderedDocument(
+            fontsWithDefaults.mapValues { font -> font.value.addFontToDocument(pdDocument) },
+            pdDocument
+        )
 
         val currentPageNumber = 0
-        for (section in sections) {
+        sections.forEach { section ->
             val sectionPages = PDPageLabelRange()
             sectionPages.style = PDPageLabelRange.STYLE_ROMAN_LOWER
             pageLabels.setLabelItem(currentPageNumber, sectionPages)
 
-            for (i in section.pages.indices) {
-                val page = section.pages[i]
+            section.pages.forEachIndexed { i, page ->
                 val outlineItems = mutableListOf<PDOutlineItem>()
-                for (j in page._outlineItems.indices) {
-                    val outlineItem = PDOutlineItem()
-                    outlineItem.title = page._outlineItems[j]
+                page.outlineItems.forEachIndexed { j, outlineItem ->
+                    val pdOutlineItem = PDOutlineItem()
+                    pdOutlineItem.title = outlineItem
                     val dest = PDPageFitWidthDestination()
                     dest.pageNumber = i
-                    outlineItem.destination = dest
-                    outlineItems += outlineItem
+                    pdOutlineItem.destination = dest
+                    outlineItems += pdOutlineItem
                 }
                 outlineItems.forEach(outline::addLast)
 
