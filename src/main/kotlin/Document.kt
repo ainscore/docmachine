@@ -10,18 +10,12 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem
 
-class Document(val fonts: Map<FontStyle, Font>, val sections: List<Section>) {
-    private var _author: String? = null
-    private var _title: String? = null
-
-    fun setAuthor(author: String) {
-        this._author = author
-    }
-
-    fun setTitle(title: String) {
-        this._title = title
-    }
-
+class Document(
+    val fonts: Map<FontStyle, Font>,
+    val sections: List<Section>,
+    val title: String = "",
+    val author: String = ""
+) {
     fun writeToFile(fileName: String) {
 
         val pdDocument = PDDocument()
@@ -73,15 +67,11 @@ class Document(val fonts: Map<FontStyle, Font>, val sections: List<Section>) {
         pdDocument.documentCatalog.pageLabels = pageLabels
         pdDocument.documentCatalog.pageMode = PageMode.USE_OUTLINES
 
-        pdDocument.documentInformation.author = _author
-        pdDocument.documentInformation.title = _title
+        pdDocument.documentInformation.author = author
+        pdDocument.documentInformation.title = title
 
-        try {
-            pdDocument.save(fileName)
-            pdDocument.close()
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
+        pdDocument.save(fileName)
+        pdDocument.close()
     }
 
 }

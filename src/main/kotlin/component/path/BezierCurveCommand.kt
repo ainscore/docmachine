@@ -3,8 +3,6 @@ package com.andrewinscore.docmachine.component.path
 import com.andrewinscore.docmachine.PdfLoc
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 
-import java.io.IOException
-
 /**
  * @author ainscore
  */
@@ -21,11 +19,6 @@ class BezierCurveCommand(
         val (x, y) = base.add(x1, y1)
         val (x1, y1) = base.add(x2, y2)
         val (x2, y2) = base.add(x3, y3)
-        try {
-            stream.curveTo(x.toFloat(), y.toFloat(), x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
+        stream.curveTo(x.toFloat(), y.toFloat(), x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
     }
 }

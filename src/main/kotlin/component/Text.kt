@@ -9,18 +9,16 @@ import com.andrewinscore.docmachine.style.CMYKColor
 import com.andrewinscore.docmachine.style.FontStyle
 import org.apache.pdfbox.pdmodel.font.PDFont
 
-import java.io.IOException
-
 import com.andrewinscore.docmachine.style.BLACK
 
-enum class HorzAlignment {
+enum class HorizontalAlignment {
     LEFT,
     CENTER,
     RIGHT,
     JUSTIFY
 }
 
-enum class VertAlignment {
+enum class VerticalAlignment {
     TOP,
     CENTER,
     BOTTOM
@@ -34,8 +32,8 @@ class Text(
     val lineHeight: Double = 10.0,
     val fontColor: CMYKColor = BLACK,
     val fontStyle: FontStyle = FontStyle.NORMAL,
-    val xAlignment: HorzAlignment = HorzAlignment.LEFT,
-    val yAlignment: VertAlignment = VertAlignment.BOTTOM,
+    val xAlignment: HorizontalAlignment = HorizontalAlignment.LEFT,
+    val yAlignment: VerticalAlignment = VerticalAlignment.BOTTOM,
     val characterSpacing: Double = 0.0
 ) : Drawable {
 
@@ -61,12 +59,12 @@ class Text(
         val yOffset: Double
 
         when (yAlignment) {
-            VertAlignment.CENTER -> yOffset = getAscent(pdFont) + lineHeight / 2 - getAscent(pdFont) / 2
-            VertAlignment.TOP -> yOffset = (getAscent(pdFont) + getAscent(pdFont)).toDouble()
+            VerticalAlignment.CENTER -> yOffset = getAscent(pdFont) + lineHeight / 2 - getAscent(pdFont) / 2
+            VerticalAlignment.TOP -> yOffset = (getAscent(pdFont) + getAscent(pdFont)).toDouble()
             else -> yOffset = getAscent(pdFont).toDouble()
         }
 
-        if (xAlignment == HorzAlignment.JUSTIFY) {
+        if (xAlignment == HorizontalAlignment.JUSTIFY) {
             val justifiedText = JustifiedText(getStringWidth, text, width)
             positionedLines = justifiedText.getText()
         } else {
@@ -87,8 +85,8 @@ class Text(
             }.map { line ->
                 var xPos = 0.0
                 when (xAlignment) {
-                    HorzAlignment.CENTER -> xPos += (width / 2.0 - getStringWidth(line) / 2.0)
-                    HorzAlignment.RIGHT -> xPos += (width - getStringWidth(line))
+                    HorizontalAlignment.CENTER -> xPos += (width / 2.0 - getStringWidth(line) / 2.0)
+                    HorizontalAlignment.RIGHT -> xPos += (width - getStringWidth(line))
                     else -> xPos = xPos
                 }
 
@@ -126,11 +124,8 @@ class Text(
                         wordPosition.word
                     )
                 }.toTypedArray()
-                try {
-                    stream.showTextWithPositioning(commands)
-                } catch (e: IOException) {
-                    throw RuntimeException(e)
-                }
+
+                stream.showTextWithPositioning(commands)
 
                 stream.newLine()
             }
@@ -173,7 +168,12 @@ class JustifiedText(val getStringWidth: (String) -> Double, val text: String, va
                 if (lines.indexOf(words) == lines.size - 1) {
                     listOf(WordPosition(words.joinToString(" "), xPos))
                 } else {
-                    words.map { word -> WordPosition(word, offset = if (words.indexOf(word) == 0) 0.0 else spaceWidth) }
+                    words.mapIndexed { wordIndex, word ->
+                        WordPosition(
+                            word,
+                            offset = if (wordIndex == 0) 0.0 else spaceWidth
+                        )
+                    }
                 }
             }
         }

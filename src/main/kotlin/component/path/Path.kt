@@ -8,16 +8,13 @@ import com.andrewinscore.docmachine.RenderedDrawable
 import com.andrewinscore.docmachine.style.CLEAR
 import com.andrewinscore.docmachine.style.CMYKColor
 
-import java.io.IOException
 
-
-class Path(val commands: List<PathCommand>, private val _fillColor: CMYKColor, private val _strokeColor: CMYKColor) :
+class Path(val commands: List<PathCommand>, val fillColor: CMYKColor, val strokeColor: CMYKColor) :
     Drawable {
     override fun draw(renderedDoc: RenderedDocument): RenderedDrawable {
         val draw: RenderFunction = { stream, loc ->
-            if (_fillColor != CLEAR) {
+            if (fillColor != CLEAR) {
                 commands.forEach { command -> command.draw(stream, loc) }
-                val fillColor = _fillColor
                 stream.setNonStrokingColor(
                     fillColor.c.toFloat(),
                     fillColor.m.toFloat(),
@@ -26,20 +23,15 @@ class Path(val commands: List<PathCommand>, private val _fillColor: CMYKColor, p
                 )
                 stream.fillEvenOdd()
             }
-            if (_strokeColor != CLEAR) {
+            if (strokeColor != CLEAR) {
                 commands.forEach { command -> command.draw(stream, loc) }
-                val strokeColor = _strokeColor
-                try {
-                    stream.setStrokingColor(
-                        strokeColor.c.toFloat(),
-                        strokeColor.m.toFloat(),
-                        strokeColor.y.toFloat(),
-                        strokeColor.k.toFloat()
-                    )
-                    stream.stroke()
-                } catch (e: IOException) {
-                    throw RuntimeException(e)
-                }
+                stream.setStrokingColor(
+                    strokeColor.c.toFloat(),
+                    strokeColor.m.toFloat(),
+                    strokeColor.y.toFloat(),
+                    strokeColor.k.toFloat()
+                )
+                stream.stroke()
             }
         }
         return RenderedDrawable(0.0, 0.0, draw)
