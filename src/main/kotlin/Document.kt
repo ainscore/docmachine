@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitWidthDestination
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem
+import java.io.OutputStream
 
 class Document(
     val fonts: Map<FontStyle, Font>,
@@ -16,7 +17,7 @@ class Document(
     val title: String = "",
     val author: String = ""
 ) {
-    fun writeToFile(fileName: String) {
+    fun writeToStream(outputStream: OutputStream) {
 
         val pdDocument = PDDocument()
         pdDocument.documentId = 12345 // Keep doc content stable across runs
@@ -40,26 +41,24 @@ class Document(
             pdDocument
         )
 
-        val currentPageNumber = 0
+        var currentPageNumber = 0
         sections.forEach { section ->
             val sectionPages = PDPageLabelRange()
             sectionPages.style = PDPageLabelRange.STYLE_ROMAN_LOWER
             pageLabels.setLabelItem(currentPageNumber, sectionPages)
 
             section.pages.forEachIndexed { i, page ->
-                val outlineItems = mutableListOf<PDOutlineItem>()
-                page.outlineItems.forEachIndexed { j, outlineItem ->
+                page.outlineItems.map { outlineItem ->
                     val pdOutlineItem = PDOutlineItem()
                     pdOutlineItem.title = outlineItem
                     val dest = PDPageFitWidthDestination()
                     dest.pageNumber = i
                     pdOutlineItem.destination = dest
-                    outlineItems += pdOutlineItem
-                }
-                outlineItems.forEach(outline::addLast)
-
+                    pdOutlineItem
+                }.forEach(outline::addLast)
                 page.draw(renderedDoc)
             }
+            currentPageNumber++
         }
 
         outline.openNode()
@@ -70,7 +69,7 @@ class Document(
         pdDocument.documentInformation.author = author
         pdDocument.documentInformation.title = title
 
-        pdDocument.save(fileName)
+        pdDocument.save(outputStream)
         pdDocument.close()
     }
 

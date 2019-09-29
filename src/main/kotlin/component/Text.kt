@@ -160,7 +160,7 @@ class JustifiedText(val getStringWidth: (String) -> Double, val text: String, va
             }
 
             val lines = getJustifiedLines(originalLine, getStringWidth)
-            return lines.mapIndexed { index, words ->
+            return lines.map { words ->
                 val NUM_WORDS = words.size
                 val wordsWidth = getStringWidth(words.joinToString(""))
                 val spaceWidth = (width - wordsWidth) / (NUM_WORDS - 1)

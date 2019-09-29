@@ -9,7 +9,7 @@ import com.andrewinscore.docmachine.RenderedDrawable
 /**
  * @author ainscore
  */
-class HorizontalLayout(val drawables: Sequence<Drawable>) : Drawable {
+class HorizontalLayout(val drawables: List<Drawable>) : Drawable {
     override fun draw(renderedDoc: RenderedDocument): RenderedDrawable {
 
         val renderedDrawables = drawables.map { it.draw(renderedDoc) }

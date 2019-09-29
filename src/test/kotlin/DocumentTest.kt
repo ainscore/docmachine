@@ -1,12 +1,22 @@
 package com.andrewinscore.docmachine
 
 import com.andrewinscore.docmachine.component.HorizontalAlignment
+import com.andrewinscore.docmachine.component.Rectangle
 import com.andrewinscore.docmachine.component.Text
-import org.junit.Test as test
+import com.andrewinscore.docmachine.component.path.Path
+import com.andrewinscore.docmachine.layout.HorizontalLayout
+import com.andrewinscore.docmachine.layout.VerticalLayout
+import com.andrewinscore.docmachine.style.BLACK
+import com.andrewinscore.docmachine.style.BLUE
+import com.andrewinscore.docmachine.style.RED
+import com.andrewinscore.docmachine.style.WHITE
+import java.nio.file.Files
+import java.nio.file.Paths
+import org.junit.Test
 
 class DocumentTest() {
-    @test
-    fun test() {
+    @Test
+    fun testJustifiedText() {
         val paragraph = Text(
             width = 612.0,
             xAlignment = HorizontalAlignment.JUSTIFY,
@@ -15,6 +25,72 @@ class DocumentTest() {
         val page = Page(pageDrawables = listOf(PageDrawable(drawable = paragraph)))
         val section = Section(listOf(page))
         val doc = Document(fonts = emptyMap(), sections = listOf(section))
-        doc.writeToFile("test.pdf")
+        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+    }
+
+    @Test
+    fun testVerticalLayout() {
+        val redRectangle = Rectangle(
+            width = 200.0,
+            height = 40.0,
+            fillColor = RED
+        )
+        val whiteRectangle = Rectangle(
+            width = 200.0,
+            height = 40.0,
+            fillColor = WHITE
+        )
+        val blueRectangle = Rectangle(
+            width = 200.0,
+            height = 40.0,
+            fillColor = BLUE
+        )
+        val flag = VerticalLayout(listOf(redRectangle, whiteRectangle, blueRectangle))
+        val page = Page(pageDrawables = listOf(PageDrawable(drawable = flag)))
+        val section = Section(listOf(page))
+        val doc = Document(fonts = emptyMap(), sections = listOf(section))
+        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+    }
+
+    @Test
+    fun testHorizontalLayout() {
+        val redRectangle = Rectangle(
+            width = 66.0,
+            height = 120.0,
+            fillColor = RED
+        )
+        val whiteRectangle = Rectangle(
+            width = 66.0,
+            height = 120.0,
+            fillColor = WHITE
+        )
+        val blueRectangle = Rectangle(
+            width = 66.0,
+            height = 120.0,
+            fillColor = BLUE
+        )
+        val flag = HorizontalLayout(listOf(redRectangle, whiteRectangle, blueRectangle))
+        val page = Page(pageDrawables = listOf(PageDrawable(drawable = flag)))
+        val section = Section(listOf(page))
+        val doc = Document(fonts = emptyMap(), sections = listOf(section))
+        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+    }
+
+    @Test
+    fun testTriangle() {
+        val path = Path.newBuilder()
+            .moveTo(20.0, 20.0)
+            .lineTo(40.0, 0.0)
+            .lineTo(0.0, 0.0)
+            .lineTo(20.0, 20.0)
+            .width(40.0)
+            .height(20.0)
+            .fillColor(RED)
+            .build()
+
+        val page = Page(pageDrawables = listOf(PageDrawable(drawable = path)))
+        val section = Section(listOf(page))
+        val doc = Document(fonts = emptyMap(), sections = listOf(section))
+        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
     }
 }
