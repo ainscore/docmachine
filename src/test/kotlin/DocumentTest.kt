@@ -6,15 +6,17 @@ import com.andrewinscore.docmachine.component.Text
 import com.andrewinscore.docmachine.component.path.Path
 import com.andrewinscore.docmachine.layout.HorizontalLayout
 import com.andrewinscore.docmachine.layout.VerticalLayout
-import com.andrewinscore.docmachine.style.BLACK
 import com.andrewinscore.docmachine.style.BLUE
 import com.andrewinscore.docmachine.style.RED
 import com.andrewinscore.docmachine.style.WHITE
 import java.nio.file.Files
 import java.nio.file.Paths
 import org.junit.Test
+import java.nio.file.StandardOpenOption
 
-class DocumentTest() {
+val DOC_ROOT = Paths.get("src/test/test_docs")
+
+class DocumentTest {
     @Test
     fun testJustifiedText() {
         val paragraph = Text(
@@ -25,7 +27,7 @@ class DocumentTest() {
         val page = Page(pageDrawables = listOf(PageDrawable(drawable = paragraph)))
         val section = Section(listOf(page))
         val doc = Document(fonts = emptyMap(), sections = listOf(section))
-        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+        doc.writeToStream(Files.newOutputStream(DOC_ROOT.resolve("test_justified.pdf")))
     }
 
     @Test
@@ -49,7 +51,7 @@ class DocumentTest() {
         val page = Page(pageDrawables = listOf(PageDrawable(drawable = flag)))
         val section = Section(listOf(page))
         val doc = Document(fonts = emptyMap(), sections = listOf(section))
-        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+        doc.writeToStream(Files.newOutputStream(DOC_ROOT.resolve("test_vertical_layout.pdf")))
     }
 
     @Test
@@ -73,7 +75,7 @@ class DocumentTest() {
         val page = Page(pageDrawables = listOf(PageDrawable(drawable = flag)))
         val section = Section(listOf(page))
         val doc = Document(fonts = emptyMap(), sections = listOf(section))
-        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+        doc.writeToStream(Files.newOutputStream(DOC_ROOT.resolve("test_horizontal_layout.pdf")))
     }
 
     @Test
@@ -91,6 +93,6 @@ class DocumentTest() {
         val page = Page(pageDrawables = listOf(PageDrawable(drawable = path)))
         val section = Section(listOf(page))
         val doc = Document(fonts = emptyMap(), sections = listOf(section))
-        doc.writeToStream(Files.newOutputStream(Paths.get("test.pdf")))
+        doc.writeToStream(Files.newOutputStream(DOC_ROOT.resolve("test_path.pdf")))
     }
 }
