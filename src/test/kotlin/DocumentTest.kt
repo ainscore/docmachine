@@ -9,10 +9,14 @@ import com.andrewinscore.docmachine.layout.VerticalLayout
 import com.andrewinscore.docmachine.style.BLUE
 import com.andrewinscore.docmachine.style.RED
 import com.andrewinscore.docmachine.style.WHITE
+import org.apache.pdfbox.pdmodel.PDDocument
 import java.nio.file.Files
 import java.nio.file.Paths
 import org.junit.Test
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.nio.file.StandardOpenOption
+import kotlin.test.assertEquals
 
 val DOC_ROOT = Paths.get("src/test/test_docs")
 
@@ -27,7 +31,13 @@ class DocumentTest {
         val page = Page(pageDrawables = listOf(PageDrawable(drawable = paragraph)))
         val section = Section(listOf(page))
         val doc = Document(fonts = emptyMap(), sections = listOf(section))
-        doc.writeToStream(Files.newOutputStream(DOC_ROOT.resolve("test_justified.pdf")))
+        val expected = PDDocument.load(Files.newInputStream(DOC_ROOT.resolve("test_justified.pdf")))
+
+        val actualStream = ByteArrayOutputStream()
+        doc.writeToStream(actualStream)
+        val actual = PDDocument.load(ByteArrayInputStream(actualStream.toByteArray()))
+        val result = visualDiff(expected, actual)
+        assertEquals(0.0, result)
     }
 
     @Test
